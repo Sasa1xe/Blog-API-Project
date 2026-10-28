@@ -1,10 +1,10 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import { pagesRouter } from "./routes/pages.routes";
-
+import { pagesRouter } from "./routes/pages.routes.js";
+import { authRouter } from "./routes/auth.routes.js";
 const app = express();
-app.use(cookieParser());
 app.use(express.json());
+app.use(cookieParser());
 
 //------------Logger---------------
 app.use((req, res, next) => {
@@ -15,7 +15,7 @@ app.use((req, res, next) => {
 
 //------------Routes---------------
 app.use(pagesRouter);
-
+app.use("/auth", authRouter);
 //---------------------------------
 
 //------------Error Handler-----------
