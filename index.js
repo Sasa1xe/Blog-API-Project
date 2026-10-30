@@ -14,8 +14,8 @@ app.use((req, res, next) => {
 //---------------------------------
 
 //------------Routes---------------
-app.use(pagesRouter);
 app.use("/auth", authRouter);
+app.use(pagesRouter);
 //---------------------------------
 
 //------------Error Handler-----------
