@@ -1,42 +1,44 @@
+
 import { and, eq, gt } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { users, sessions } from "../db/schema.js";
 
 export async function createUser(username, email, password_hash) {
-  const res = await db
+  const [user] = await db
     .insert(users)
     .values({
-      username: username,
-      email: email,
-      password_hash: password_hash,
+      username,
+      email,
+      password_hash,
     })
     .returning();
-  return res;
+  return user;
 }
+
 export async function findUserByEmail(email) {
-  const data = await db
+  const [user] = await db
     .select()
     .from(users)
     .where(eq(users.email, email))
     .limit(1);
 
-  if (data.length) {
-    return data[0];
-  } else {
-    return false;
-  }
+  return user ?? null;
 }
+
 export async function createSession({ session_id, user_id, expires_at }) {
-  const res = await db.insert(sessions).values({
-    session_id: session_id,
-    user_id: user_id,
-    expires_at: expires_at,
-  });
-  return res;
+  const [session] = await db
+    .insert(sessions)
+    .values({
+      session_id,
+      user_id,
+      expires_at,
+    })
+    .returning();
+  return session;
 }
 
 export async function findValidSession(session_id) {
-  const user = await db
+  const [user] = await db
     .select({
       id: users.id,
       username: users.username,
@@ -49,13 +51,14 @@ export async function findValidSession(session_id) {
         eq(sessions.session_id, session_id),
         gt(sessions.expires_at, new Date()),
       ),
-    );
-  return user;
+    )
+    .limit(1);
+
+  return user ?? null;
 }
 
 export async function deleteSession(session_id) {
-  const res = await db
+  await db
     .delete(sessions)
-    .where(eq(sessions.id, session_id))
-    .returning();
+    .where(eq(sessions.session_id, session_id));
 }
