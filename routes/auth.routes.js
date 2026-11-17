@@ -19,7 +19,7 @@ authRouter.post("/register", validateBody(registerSchema), async (req, res) => {
   const existingUser = await findUserByEmail(body.email);
   if (existingUser) {
     return res.status(422).json({
-      error: "email already in use",
+      errors: { email: { errors: ["email already in use"] } },
     });
   } else {
     await createUser(req.body.username, req.body.email, password_hash);
